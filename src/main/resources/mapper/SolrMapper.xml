@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xsxs.solrdemo.dao.SolrDao">
+  <select id="search" resultType="cn.xsxs.solrdemo.pojo.dynamictype" resultMap="filtercontent">
+    SELECT
+    u.id,
+	uid,
+	uname,
+	p_brithday,
+	p_sex,
+	pi.pi_background,
+	kc_content,
+	p_age,
+	pa_intro,
+	w_type,
+	dt_type,
+	c_time,
+	c_price
+FROM
+	userinfo u
+	LEFT JOIN paccount p ON u.uid = p.pa_pid
+	LEFT JOIN whoami w ON p.pa_userid = w.id
+	LEFT JOIN picture pi ON p.pa_tx = pi.id
+	LEFT JOIN money m ON p.pa_pid = m.a_id
+	LEFT JOIN userlabel ul ON u.uid = ul.ul_pid
+	LEFT JOIN dynamictype d ON ul.ul_type = d.id
+	LEFT JOIN filtercontent f ON u.p_cityid = f.id
+	where pa_accountstatus = 0 and pa_userid BETWEEN 2 and 3
+  </select>
+
+  <resultMap id="solrCommitAll" type="cn.xsxs.solrdemo.pojo.UserInfo">
+    <id property="id" column="id"></id>
+    <result property="uid" column="uid"></result>
+    <result property="uname" column="uname"></result>
+    <result property="pBrithday" column="p_brithday"></result>
+    <result property="pSex" column="p_sex"></result>
+    <result property="pAge" column="p_age"></result>
+  </resultMap>
+	<resultMap id="paccount" type="cn.xsxs.solrdemo.pojo.paccount" extends="solrCommitAll">
+		<result property="paIntro" column="pa_intro"></result>
+	</resultMap>
+
+	<resultMap id="whoami" type="cn.xsxs.solrdemo.pojo.whoami" extends="paccount">
+		<result property="wType" column="w_type"></result>
+	</resultMap>
+
+	<resultMap id="money" type="cn.xsxs.solrdemo.pojo.money" extends="whoami">
+		<result property="cTime" column="c_time"></result>
+		<result property="cPrice" column="c_price"></result>
+	</resultMap>
+
+	<resultMap id="picture" type="cn.xsxs.solrdemo.pojo.picture" extends="money">
+		<result property="piBackground" column="pi_background"></result>
+	</resultMap>
+	<resultMap id="userlabel" type="cn.xsxs.solrdemo.pojo.userlabel" extends="picture">
+		<result property="ulPid" column="ul_pid"></result>
+		<result property="ulType" column="ul_type"></result>
+	</resultMap>
+	<resultMap id="dynamictype" type="cn.xsxs.solrdemo.pojo.dynamictype" extends="userlabel">
+		<result property="dtType" column="dt_type"></result>
+	</resultMap>
+
+	<resultMap id="filtercontent" type="cn.xsxs.solrdemo.pojo.filtercontent" extends="dynamictype">
+		<result property="kcContent" column="kc_content"></result>
+	</resultMap>
+
+</mapper>
